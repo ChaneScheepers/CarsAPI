@@ -5,61 +5,37 @@ const cors = require("cors");
 const CarModel = require("./models/CarModels");
 const PORT = 4000;
 
+const carControllers = require("./controllers/carController");
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-//Connect with Mongoose added access to be able to access from anywhere as requested. 
+//Connect with Mongoose added access to be able to access from anywhere as requested.
 mongoose.connect(
   "mongodb+srv://chanescheep:Chane@carcluster0.sdq4hgd.mongodb.net/"
 );
 
 //Get all
-app.get("/", (req, res) => {
-  CarModel.find({})
-    .then((cars) => res.json(cars))
-    .catch((err) => res.json(err));
-});
+app.get("/", carControllers.find_cars);
 
 // get specific by ID
-app.get("/getCar/:id", (req, res) => {
-  const id = req.params.id;
-  CarModel.findById({ _id: id })
-    .then((cars) => res.json(cars))
-    .catch((err) => res.json(err));
-});
+app.get("/getCar/:id", carControllers.find_car);
 
 //Post - add new
-app.post("/createCar", (req, res) => {
-  CarModel.create(req.body)
-    .then((cars) => res.json(cars))
-    .catch((err) => res.json(err));
-});
+app.post("/createCar", carControllers.post_car);
 
 //Delete specific by ID
-app.delete("/deleteCar/:id", (req, res) => {
-  const id = req.params.id;
-  CarModel.findByIdAndDelete({ _id: id })
-    .then((cars) => res.json(cars))
-    .catch((err) => res.json(err));
-});
+app.delete("/deleteCar/:id", carControllers.del_car);
 
 //Put - change spesific by ID
-app.put("/update/:id", (req, res) => {
-  const id = req.params.id;
-  CarModel.findByIdAndUpdate(
-    { _id: id },
-    {
-      owner: req.body.owner,
-      model: req.body.model,
-      registration: req.body.registration,
-      address: req.body.address,
-      make: req.body.make,
-    }
-  )
-    .then((cars) => res.json(cars))
-    .catch((err) => res.json(err));
-});
+app.put("/update/:id", carControllers.edit_car);
+
+//Put - change spesific by ID
+// app.put("/update/:filter/:update/:filterTwo/:option", carControllers.update_many);
+
+app.put("/update", carControllers.update_cars);
+// body: update
 
 //Listen
 app.listen(PORT, () => {
